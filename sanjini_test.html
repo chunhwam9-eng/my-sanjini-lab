@@ -1,4 +1,7 @@
 
+from IPython.display import HTML
+
+html_content = """
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,9 +9,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>산지니의 실험실 - 캠퍼스 성향 테스트</title>
     <style>
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
             color: #333;
             line-height: 1.6;
             margin: 0;
@@ -16,63 +24,80 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center; /* Added for vertical centering */
             min-height: 100vh;
         }
         .container {
             background: #fff;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-width: 700px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 600px;
             width: 100%;
+            min-width: 300px; /* Added for minimum width */
+            min-height: 200px; /* Added for minimum height */
             text-align: center;
         }
         h1 {
             color: #2c3e50;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 1.8em;
         }
         h2 {
-            color: #34495e;
-            margin-top: 5px;
-            margin-bottom: 20px;
+            color: #7f8c8d;
+            margin-top: 0;
+            font-size: 1.1em;
+            margin-bottom: 25px;
         }
-        .question-container {
-            margin-top: 30px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+
+        /* Progress Bar Styles */
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            height: 10px;
+            overflow: hidden;
         }
+        .progress-bar {
+            height: 100%;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
         .question {
             font-size: 1.2em;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-weight: bold;
             color: #2c3e50;
             text-align: left;
+            word-break: keep-all;
         }
         .options {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 20px;
             text-align: left;
         }
-        .option-label {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .option-button {
+            padding: 18px;
+            background-color: #fdfdfd;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            transition: all 0.2s ease;
+            font-size: 1em;
+            text-align: left;
+            word-break: keep-all;
         }
-        .option-label:hover {
-            background-color: #e9e9e9;
+        .option-button:hover {
+            background-color: #f1f8ff;
             border-color: #3498db;
         }
-        .option-label input[type="radio"] {
-            margin-right: 15px;
-            transform: scale(1.5); /* Make radio button larger */
-        }
+
+        /* Result Styles */
         .result-container {
             margin-top: 30px;
             border-top: 1px solid #eee;
@@ -92,11 +117,8 @@
             font-weight: bold;
             margin-bottom: 10px;
         }
-        .result-description {
-            margin-bottom: 10px;
-        }
+        .result-description,
         .result-item {
-            margin-left: 20px;
             margin-bottom: 5px;
         }
         .loading-message {
@@ -107,20 +129,50 @@
         }
         .next-button-container {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            display: flex; /* Use flexbox for buttons */
+            justify-content: center; /* Center buttons horizontally */
+            gap: 15px; /* Space between buttons */
         }
         .next-button {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
+            padding: 15px 35px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(40,167,69,0.2);
         }
         .next-button:hover {
             background-color: #218838;
+            transform: translateY(-2px);
+        }
+        .next-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .option-radio-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 15px;
+            background-color: #fdfdfd;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .option-radio-label:hover {
+            background-color: #f1f8ff;
+            border-color: #3498db;
+        }
+        .option-radio-label input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            accent-color: #3498db;
         }
     </style>
 </head>
@@ -130,10 +182,15 @@
         <h2>캠퍼스 성향 테스트에 오신 것을 환영합니다!</h2>
         <p>나의 캠퍼스 라이프 스타일을 통해 어떤 산지니인지 알아보세요.</p>
 
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
         <div id="question-area" class="question-container">
             <div class="question" id="question-text"></div>
             <div class="options" id="options-container"></div>
             <div class="next-button-container">
+                <button id="prev-button" class="next-button" style="background-color: #6c757d; display: none;">이전</button>
                 <button id="next-button" class="next-button" style="display: none;">다음</button>
             </div>
             <div id="loading-message" class="loading-message" style="display: none;">데이터를 바탕으로 당신의 내면을 분석 중입니다...</div>
@@ -154,7 +211,7 @@
         let scoreJ = 0;
         let scoreP = 0;
         let currentQuestionIndex = 0;
-        let selectedOptionType = null; // To store the type of the currently selected option
+        let userSelections = []; // Store selected option types for each question
 
         const questions = [
             {
@@ -227,29 +284,59 @@
         const resultAreaElement = document.getElementById('result-area');
         const loadingMessageElement = document.getElementById('loading-message');
         const nextButton = document.getElementById('next-button');
+        const prevButton = document.getElementById('prev-button'); // Get previous button
+        const progressBar = document.getElementById('progress-bar');
 
-        nextButton.onclick = processSelection; // Attach event listener to the next button
+        nextButton.onclick = goToNextQuestion;
+        prevButton.onclick = goToPreviousQuestion; // Assign handler for previous button
+
+        function updateProgressBar() {
+            // Calculate progress based on answered questions
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            progressBar.style.width = progress + '%';
+        }
 
         function displayQuestion() {
-            selectedOptionType = null; // Reset selection for new question
-            nextButton.style.display = 'none'; // Hide next button initially
+            // Hide result area if visible
+            resultAreaElement.style.display = 'none';
+            questionAreaElement.style.display = 'block';
+
+            // Update progress bar
+            updateProgressBar();
+
+            // Handle prev button visibility
+            prevButton.style.display = currentQuestionIndex === 0 ? 'none' : 'block';
 
             if (currentQuestionIndex < questions.length) {
                 const q = questions[currentQuestionIndex];
                 questionTextElement.textContent = q.q;
                 optionsContainerElement.innerHTML = ''; // Clear previous options
 
+                let optionSelected = userSelections[currentQuestionIndex] !== undefined && userSelections[currentQuestionIndex] !== null;
+
+                // Initially hide next button until an option is selected for the current question
+                // Or if an option was already selected for this question
+                nextButton.style.display = optionSelected ? 'block' : 'none';
+                nextButton.disabled = !optionSelected; // Disable if no option selected
+
                 q.options.forEach((option, index) => {
                     const label = document.createElement('label');
-                    label.classList.add('option-label');
+                    label.classList.add('option-radio-label');
 
                     const radioInput = document.createElement('input');
                     radioInput.type = 'radio';
-                    radioInput.name = 'q' + currentQuestionIndex; // Group radio buttons by question
+                    radioInput.name = 'q' + currentQuestionIndex;
                     radioInput.value = option.type;
+
+                    // Pre-select if previously answered
+                    if (userSelections[currentQuestionIndex] === option.type) {
+                        radioInput.checked = true;
+                    }
+
                     radioInput.onchange = () => {
-                        selectedOptionType = option.type;
-                        nextButton.style.display = 'block'; // Show next button when an option is selected
+                        userSelections[currentQuestionIndex] = option.type; // Save selection
+                        nextButton.style.display = 'block'; // Show next button
+                        nextButton.disabled = false; // Enable next button
                     };
 
                     label.appendChild(radioInput);
@@ -257,33 +344,50 @@
                     optionsContainerElement.appendChild(label);
                 });
             } else {
+                // If all questions are answered, proceed to results
                 showLoadingAndResults();
             }
         }
 
-        function processSelection() {
-            if (selectedOptionType) {
-                if (selectedOptionType === 'E') scoreE++;
-                else if (selectedOptionType === 'I') scoreI++;
-                else if (selectedOptionType === 'J') scoreJ++;
-                else if (selectedOptionType === 'P') scoreP++;
-
+        function goToNextQuestion() {
+            // This function is called when nextButton is clicked
+            if (currentQuestionIndex < questions.length) { // Check if there are more questions
                 currentQuestionIndex++;
                 displayQuestion();
             }
         }
 
+        function goToPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            }
+        }
+
+        function calculateScoresFromResult() {
+            scoreE = 0; scoreI = 0; scoreJ = 0; scoreP = 0;
+            userSelections.forEach(selection => {
+                if (selection === 'E') scoreE++;
+                else if (selection === 'I') scoreI++;
+                else if (selection === 'J') scoreJ++;
+                else if (selection === 'P') scoreP++;
+            });
+        }
+
         function showLoadingAndResults() {
             questionAreaElement.style.display = 'none';
             loadingMessageElement.style.display = 'block';
+            progressBar.style.width = '100%'; // Ensure progress bar is full at the end
 
             setTimeout(() => {
                 loadingMessageElement.style.display = 'none';
                 displayResult();
-            }, 2000); // Simulate 2-second delay for analysis
+            }, 2000);
         }
 
         function displayResult() {
+            calculateScoresFromResult(); // Calculate scores right before displaying results
+
             let resultType = "";
             resultType += (scoreE > scoreI) ? "E" : "I";
             resultType += (scoreP > scoreJ) ? "P" : "J";
@@ -303,3 +407,6 @@
     </script>
 </body>
 </html>
+"""
+
+HTML(html_content)
